@@ -1,4 +1,5 @@
 # Retrofit-DSL
+[![Build Status](https://travis-ci.org/piruin/retrofit-dsl.svg?branch=master)](https://travis-ci.org/piruin/retrofit-dsl)
 
 Retrofit itself is great but it not design for Kotlin. This small plug-in library will make Retrofit look great on your `.kt`.
 
@@ -27,17 +28,12 @@ Isn't it good?
 ## Download
 
 ```groovy
-allprojects {
-		repositories {
-        ...
-        maven { url 'https://jitpack.io' }
-		}
+repositories {
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-    ...
     implementation "com.github.piruin:retrofit2-dsl:{latest-version}"
-    ...
 }
 ```
 

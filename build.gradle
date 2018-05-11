@@ -1,0 +1,34 @@
+buildscript {
+    ext.kotlin_version = '1.2.31'
+
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+apply plugin: 'kotlin'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    def retrofitVersion = '2.3.0'
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'com.squareup.okhttp3:mockwebserver:3.8.0'
+    testImplementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    testImplementation 'net.jodah:concurrentunit:0.4.3'
+}
+
+task wrapper(type: Wrapper) {
+    description 'Creates the gradle wrapper.'
+    gradleVersion '4.6'
+    distributionUrl = distributionUrl.replace("bin", "all")
+}

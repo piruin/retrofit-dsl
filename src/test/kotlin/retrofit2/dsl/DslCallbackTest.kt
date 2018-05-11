@@ -3,92 +3,70 @@ package retrofit2.dsl
 import com.google.gson.JsonSyntaxException
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import retrofit2.Call
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 
-class RetrofitEnqueueDslTest {
+class DslCallbackTest {
 
-    val server = MockWebServer();
+    @get:Rule val server = MockWebServer()
 
     lateinit var service: MessagingService
 
-    @Before
-    fun setUp() {
+    @Before fun setUp() {
         service = retrofitFor<MessagingService> {
             baseUrl(server.url(""))
             addConverterFactory(GsonConverterFactory.create())
         }
     }
 
-    @Test
-    fun onSuccess() {
+    @Test fun onSuccess() {
         server.enqueue {
             setResponseCode(200)
-            setBody(
-                    """
-        {
-          "message": "Hello"
-        }
-        """
-            )
+            setBody("""{"message": "Hello"}""")
         }
 
         waiter {
-            service.getMessage()
-                    .enqueue {
-                        onSuccess {
-                            assert(body()?.message == "Hello") { "Response must be Hello" }
-                            resume()
-                        }
-                    }
+            service.getMessage().enqueue {
+                onSuccess {
+                    assert(body()?.message == "Hello") { "Response must be Hello" }
+                    resume()
+                }
+            }
         }
     }
 
-    @Test
-    fun onFailure() {
+    @Test fun onFailure() {
         server.enqueue {
             setResponseCode(200)
-            setBody(
-                    """
-          "message": "Hello"
-        """
-            )
+            setBody(""""message": "Hello"""")
         }
 
         waiter {
-            service.getMessage()
-                    .enqueue {
-                        onFailure {
-                            assert(it is JsonSyntaxException)
-                            resume()
-                        }
-                    }
+            service.getMessage().enqueue {
+                onFailure {
+                    assert(it is JsonSyntaxException)
+                    resume()
+                }
+            }
         }
     }
 
-    @Test
-    fun onError() {
+    @Test fun onError() {
         server.enqueue {
             setResponseCode(400)
-            setBody(
-                    """{
-          "message": "Bad Request",
-          "code": 400
+            setBody("""{"message": "Bad Request","code": 400}""")
         }
-        """)
-        }
-
         waiter {
-            service.getMessage()
-                    .enqueue {
-                        onError {
-                            assert(code() == 400)
-                            assert(errorBody()?.string()?.contains("Bad Request") == true)
-                            resume()
-                        }
-                    }
+            service.getMessage().enqueue {
+                onError {
+                    assert(code() == 400)
+                    assert(errorBody()?.string()?.contains("Bad Request") == true)
+                    resume()
+                }
+            }
         }
     }
 
@@ -98,5 +76,3 @@ class RetrofitEnqueueDslTest {
 
     data class Messaging(val code: Int?, val message: String)
 }
-
-

@@ -1,15 +1,16 @@
 # Retrofit-DSL
 [![Build Status](https://travis-ci.org/piruin/retrofit-dsl.svg?branch=master)](https://travis-ci.org/piruin/retrofit-dsl)
+[![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/)
 
 Retrofit itself is great but it not design for Kotlin. This small plug-in library will make Retrofit look great on your `.kt`.
 
 With Retrofit-DSL our code will look like below
 
 ```kotlin
- var service = retrofitFor<MessagingService> {
-        baseUrl(server.url(""))
-        addConverterFactory(GsonConverterFactory.create())
-    }
+ var service = retrofitFor<MessagingService> { //this: Retrofit.Builder
+     baseUrl(server.url(""))
+     addConverterFactory(GsonConverterFactory.create())
+ }
  service.getMessage().enqueue {
      onSuccess { //this: Response<T>
         println(body())

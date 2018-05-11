@@ -2,7 +2,7 @@ buildscript {
     ext.kotlin_version = '1.2.31'
 
     repositories {
-        mavenCentral()
+        jcenter()
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -12,11 +12,16 @@ buildscript {
 apply plugin: 'kotlin'
 
 repositories {
-    mavenCentral()
+    jcenter()
+}
+
+configurations {
+    ktlint
 }
 
 dependencies {
     def retrofitVersion = '2.3.0'
+    ktlint "com.github.shyiko:ktlint:0.23.1"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
@@ -25,6 +30,24 @@ dependencies {
     testImplementation 'com.squareup.okhttp3:mockwebserver:3.8.0'
     testImplementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     testImplementation 'net.jodah:concurrentunit:0.4.3'
+}
+
+task ktlint(type: JavaExec, group: "verification") {
+    description = "Check Kotlin code style."
+    classpath = configurations.ktlint
+    main = "com.github.shyiko.ktlint.Main"
+    args "src/**/*.kt"
+    // to generate report in checkstyle format prepend following args:
+    // "--reporter=plain", "--reporter=checkstyle,output=${buildDir}/ktlint.xml"
+    // see https://github.com/shyiko/ktlint#usage for more
+}
+check.dependsOn ktlint
+
+task ktlintFormat(type: JavaExec, group: "formatting") {
+    description = "Fix Kotlin code style deviations."
+    classpath = configurations.ktlint
+    main = "com.github.shyiko.ktlint.Main"
+    args "-F", "src/**/*.kt"
 }
 
 task wrapper(type: Wrapper) {

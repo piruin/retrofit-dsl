@@ -27,11 +27,11 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class DslCallback<T> : Callback<T> {
+open class DslCallback<T> : Callback<T> {
 
-    var onSuccess: ((Response<T>) -> Unit)? = null
-    var onError: ((Response<T>) -> Unit)? = null
-    var onFailure: ((t: Throwable) -> Unit)? = null
+    private var onSuccess: ((Response<T>) -> Unit)? = null
+    private var onError: ((Response<T>) -> Unit)? = null
+    private var onFailure: ((t: Throwable) -> Unit)? = null
 
     override fun onFailure(call: Call<T>, t: Throwable) {
         onFailure?.invoke(t)
@@ -58,9 +58,6 @@ class DslCallback<T> : Callback<T> {
     }
 }
 
-inline fun <T> Call<T>.enqueue(
-        callback: DslCallback<T> = DslCallback(),
-        dsl: DslCallback<T>.() -> Unit
-) {
-    enqueue(callback.apply(dsl))
+inline fun <T> Call<T>.enqueue(callback: DslCallback<T> = DslCallback(), block: DslCallback<T>.() -> Unit) {
+    enqueue(callback.apply(block))
 }

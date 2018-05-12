@@ -34,7 +34,7 @@ repositories {
 }
 
 dependencies {
-    implementation "com.github.piruin:retrofit2-dsl:{latest-version}"
+    implementation "com.github.piruin:retrofit-dsl:{latest-version}"
 }
 ```
 

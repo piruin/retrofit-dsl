@@ -28,7 +28,7 @@ class DslCallbackTest {
             setBody("""{"message": "Hello"}""")
         }
 
-        waiter {
+        waitFor {
             service.getMessage().enqueue {
                 onSuccess {
                     assert(body()?.message == "Hello") { "Response must be Hello" }
@@ -44,7 +44,7 @@ class DslCallbackTest {
             setBody(""""message": "Hello"""")
         }
 
-        waiter {
+        waitFor {
             service.getMessage().enqueue {
                 onFailure {
                     assert(it is JsonSyntaxException)
@@ -59,7 +59,8 @@ class DslCallbackTest {
             setResponseCode(400)
             setBody("""{"message": "Bad Request","code": 400}""")
         }
-        waiter {
+
+        waitFor {
             service.getMessage().enqueue {
                 onError {
                     assert(code() == 400)

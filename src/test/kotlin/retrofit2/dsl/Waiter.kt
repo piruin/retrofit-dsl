@@ -9,7 +9,7 @@ fun Waiter.assert(value: Boolean, lazyMessage: () -> String) {
     assertTrue(value)
 }
 
-fun waiter(time: Long = 3000, block: Waiter.() -> Unit) {
+fun waitFor(time: Long = 3000, block: Waiter.() -> Unit) {
     val waiter = Waiter()
     waiter.block()
     waiter.await(time)

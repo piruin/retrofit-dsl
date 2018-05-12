@@ -1,5 +1,6 @@
 # Retrofit-DSL
 [![Build Status](https://travis-ci.org/piruin/retrofit-dsl.svg?branch=master)](https://travis-ci.org/piruin/retrofit-dsl)
+[![jitpack](https://jitpack.io/v/piruin/retrofit-dsl.svg)](https://jitpack.io/#piruin/retrofit-dsl)
 [![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/)
 
 Retrofit itself is great but it not design for Kotlin. This small plug-in library will make Retrofit look great on your `.kt`.

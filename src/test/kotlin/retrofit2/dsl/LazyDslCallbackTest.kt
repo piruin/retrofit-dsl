@@ -6,7 +6,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.dsl.DslCallbackTest.MessagingService
 
 class LazyDslCallbackTest {
 

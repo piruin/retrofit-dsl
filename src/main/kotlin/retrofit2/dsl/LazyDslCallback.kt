@@ -48,8 +48,7 @@ open class LazyDslCallback<T> : Callback<T>{
     }
 
     fun catch(block: (res: Response<T>?, t: Throwable?) -> Unit) : LazyDslCallback<T> {
-        catch = block
-        return this
+        return this.apply { catch = block }
     }
 
     fun finally(block: () -> Unit) {

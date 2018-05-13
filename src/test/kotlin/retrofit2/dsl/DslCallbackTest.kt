@@ -5,9 +5,7 @@ import okhttp3.mockwebserver.MockWebServer
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import retrofit2.Call
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
 
 class DslCallbackTest {
 
@@ -30,8 +28,37 @@ class DslCallbackTest {
 
         waitFor {
             service.getMessage().enqueue {
+                var isAlwaysCall = false
+                always {
+                    isAlwaysCall = true
+                }
                 onSuccess {
                     assert(body()?.message == "Hello") { "Response must be Hello" }
+                }
+                finally {
+                    assert(isAlwaysCall)
+                    resume()
+                }
+            }
+        }
+    }
+
+    @Test fun onRedirect() {
+        server.enqueue {
+            setResponseCode(300)
+            setBody("""{"message": "Redirect"}""")
+        }
+
+        waitFor {
+            service.getMessage().enqueue {
+                onSuccess {
+                    assert(true == false) { "onSuccess shouldn't be call"}
+                }
+                onError {
+                    assert(code() == 300) { "Must call onError before onClientError" }
+                }
+                onRedirect {
+                    assert(errorBody()?.string()?.contains( "Redirect") == true)
                     resume()
                 }
             }
@@ -46,15 +73,22 @@ class DslCallbackTest {
 
         waitFor {
             service.getMessage().enqueue {
+                var isAlwaysCall = false
+                always {
+                    isAlwaysCall = true
+                }
                 onFailure {
                     assert(it is JsonSyntaxException)
+                }
+                finally {
+                    assert(isAlwaysCall)
                     resume()
                 }
             }
         }
     }
 
-    @Test fun onError() {
+    @Test fun onNotSuccess() {
         server.enqueue {
             setResponseCode(400)
             setBody("""{"message": "Bad Request","code": 400}""")
@@ -71,9 +105,67 @@ class DslCallbackTest {
         }
     }
 
-    interface MessagingService {
-        @GET("message") fun getMessage(): Call<Messaging>
+    @Test fun onClientError() {
+        server.enqueue {
+            setResponseCode(401)
+            setBody("""{"message": "Unauthorized","code": 401}""")
+        }
+
+        waitFor {
+            service.getMessage().enqueue {
+                onError {
+                    assert(code() == 401) { "Must call onError before onClientError" }
+                }
+                onClientError {
+                    assert(errorBody()?.string()?.contains("Unauthorized") == true)
+                    resume()
+                }
+                onServerError {
+                    assert(true == false) { "onServerError shouldn't be call"}
+                }
+            }
+        }
     }
 
-    data class Messaging(val code: Int?, val message: String)
+    @Test fun onServerError() {
+        server.enqueue {
+            setResponseCode(500)
+            setBody("""{"message": "Internal Server Error","code": 500}""")
+        }
+
+        waitFor {
+            service.getMessage().enqueue {
+                onError {
+                    assert(code() == 500) { "Must call onError before onClientError" }
+                }
+                onClientError {
+                    assert(true == false) { "onClientError shouldn't be call"}
+                }
+                onServerError {
+                    assert(errorBody()?.string()?.contains("Internal") == true)
+                    resume()
+                }
+            }
+        }
+    }
+
+    @Test
+    fun postSuccess() {
+        server.enqueue {
+            setResponseCode(201)
+            setBody("""{"message": "created", "code": 201}""")
+        }
+
+        waitFor {
+            service.sendMessage(Messaging( 200,"Hello World")).enqueue {
+                onSuccess {
+                    assert(body()?.code == 201)
+                    assert(body()?.message == "created")
+                }
+                finally {
+                    resume()
+                }
+            }
+        }
+    }
 }

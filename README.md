@@ -15,14 +15,30 @@ With Retrofit-DSL our code will look like below.
      addConverterFactory(GsonConverterFactory.create())
  }
  service.getMessage().enqueue {
+     always {
+        //when response return or failure
+     }
      onSuccess { //this: Response<T>
         println(body())
      }
      onError { //this: Response<T>
         println(errorBody())
+        //call when response not in 2xx
+     }
+     onRedirect {
+        //3xx
+     }
+     onClientError {
+        //4xx
+     }
+     onServerError {
+        //5xx
      }
      onFailure { //it: Throwable
         it.printStackTrace()
+     }
+     finally {
+        //always call successful or not
      }
  }
 ```

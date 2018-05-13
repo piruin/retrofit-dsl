@@ -27,7 +27,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-open class LazyDslCallback<T> : Callback<T>{
+open class LazyDslCallback<T> : Callback<T> {
 
     var then: ((T?) -> Unit)? = null
     var catch: ((Response<T>?, Throwable?) -> Unit)? = null
@@ -47,7 +47,7 @@ open class LazyDslCallback<T> : Callback<T>{
         finally?.invoke()
     }
 
-    fun catch(block: (res: Response<T>?, t: Throwable?) -> Unit) : LazyDslCallback<T> {
+    fun catch(block: (res: Response<T>?, t: Throwable?) -> Unit): LazyDslCallback<T> {
         return this.apply { catch = block }
     }
 
@@ -57,8 +57,9 @@ open class LazyDslCallback<T> : Callback<T>{
 }
 
 fun <T> retrofit2.Call<T>.then(
-        lazyCallback: LazyDslCallback<T> = LazyDslCallback(),
-        block: (T?) -> Unit) : LazyDslCallback<T> {
+    lazyCallback: LazyDslCallback<T> = LazyDslCallback(),
+    block: (T?) -> Unit
+): LazyDslCallback<T> {
     enqueue(lazyCallback.apply { then = block })
     return lazyCallback
 }

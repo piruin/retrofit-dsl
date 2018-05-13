@@ -52,13 +52,13 @@ class DslCallbackTest {
         waitFor {
             service.getMessage().enqueue {
                 onSuccess {
-                    assert(true == false) { "onSuccess shouldn't be call"}
+                    assert(true == false) { "onSuccess shouldn't be call" }
                 }
                 onError {
                     assert(code() == 300) { "Must call onError before onClientError" }
                 }
                 onRedirect {
-                    assert(errorBody()?.string()?.contains( "Redirect") == true)
+                    assert(errorBody()?.string()?.contains("Redirect") == true)
                     resume()
                 }
             }
@@ -121,7 +121,7 @@ class DslCallbackTest {
                     resume()
                 }
                 onServerError {
-                    assert(true == false) { "onServerError shouldn't be call"}
+                    assert(true == false) { "onServerError shouldn't be call" }
                 }
             }
         }
@@ -139,7 +139,7 @@ class DslCallbackTest {
                     assert(code() == 500) { "Must call onError before onClientError" }
                 }
                 onClientError {
-                    assert(true == false) { "onClientError shouldn't be call"}
+                    assert(true == false) { "onClientError shouldn't be call" }
                 }
                 onServerError {
                     assert(errorBody()?.string()?.contains("Internal") == true)
@@ -157,7 +157,7 @@ class DslCallbackTest {
         }
 
         waitFor {
-            service.sendMessage(Messaging( 200,"Hello World")).enqueue {
+            service.sendMessage(Messaging(200, "Hello World")).enqueue {
                 onSuccess {
                     assert(body()?.code == 201)
                     assert(body()?.message == "created")

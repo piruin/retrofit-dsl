@@ -44,7 +44,7 @@ class LazyDslCallbackTest {
         }
 
         waitFor {
-            service.getMessage().then {}.catch { res, t ->
+            service.getMessage().then {}.catch { res, _ ->
                 assert(res?.code() == 400)
                 assert(res?.errorBody()?.string()?.contains("Bad Request") == true)
                 resume()
@@ -60,7 +60,7 @@ class LazyDslCallbackTest {
         }
 
         waitFor {
-            service.getMessage().then {}.catch { res, t ->
+            service.getMessage().then {}.catch { _, t ->
                 assert(t is JsonSyntaxException)
                 resume()
             }
@@ -83,5 +83,3 @@ class LazyDslCallbackTest {
         }
     }
 }
-
-

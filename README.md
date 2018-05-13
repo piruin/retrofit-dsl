@@ -59,7 +59,7 @@ But If you wanna use more lazy form, Try this below.
   }
 ```
 
-`catch()` and `finally` are optional
+`catch()` and `finally()` are optional
 
 ## Download
 

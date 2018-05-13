@@ -5,7 +5,9 @@
 
 Retrofit itself is great but it not design for Kotlin. This small plug-in library will make Retrofit look great on your `.kt`.
 
-With Retrofit-DSL our code will look like below
+## Usage
+
+With Retrofit-DSL our code will look like below.
 
 ```kotlin
  var service = retrofitFor<MessagingService> { //this: Retrofit.Builder
@@ -25,7 +27,20 @@ With Retrofit-DSL our code will look like below
  }
 ```
 
-Isn't it good?
+Isn't it good? But If you wanna use more lazy form, try this below.
+
+```kotlin
+  service.getMessage().then { message ->
+      println(message)
+  }.catch { res, t ->
+      when(res?.code) {
+       // res return when request not successful
+      }
+      t?.let { alert(it) } //throwable return on failure
+  }.finally {
+    dialog.dismiss() //Always call
+  }
+```
 
 ## Download
 
@@ -35,7 +50,9 @@ repositories {
 }
 
 dependencies {
-    implementation "com.github.piruin:retrofit-dsl:{latest-version}"
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    ...
+    implementation "com.github.piruin:retrofit-dsl:$retrofit_dsl_version" //Change to latest version
 }
 ```
 

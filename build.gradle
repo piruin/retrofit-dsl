@@ -1,5 +1,6 @@
 buildscript {
     ext.kotlin_version = '1.2.41'
+    ext.retrofit_version = '2.3.0'
 
     repositories {
         jcenter()
@@ -20,15 +21,14 @@ configurations {
 }
 
 dependencies {
-    def retrofitVersion = '2.3.0'
     ktlint "com.github.shyiko:ktlint:0.23.1"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+    compileOnly "com.squareup.retrofit2:retrofit:$retrofit_version"
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'com.squareup.okhttp3:mockwebserver:3.8.0'
-    testImplementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    testImplementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
     testImplementation 'net.jodah:concurrentunit:0.4.3'
 }
 

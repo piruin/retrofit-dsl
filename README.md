@@ -3,7 +3,7 @@
 [![jitpack](https://jitpack.io/v/piruin/retrofit-dsl.svg)](https://jitpack.io/#piruin/retrofit-dsl)
 [![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/)
 
-Retrofit itself is great but it not design for Kotlin. This small plug-in library will make Retrofit look great on your `.kt`.
+[Retrofit](http://square.github.io/retrofit/) itself is great but it not design for Kotlin. This small plug-in library will make Retrofit look great on your `.kt`.
 
 ## Usage
 
@@ -22,16 +22,15 @@ With Retrofit-DSL our code will look like below.
         println(body())
      }
      onError { //this: Response<T>
-        println(errorBody())
-        //call when response not in 2xx
+        println(errorBody()) //call when response not in 2xx
      }
-     onRedirect {
+     onRedirect { //this: Response<T>
         //3xx
      }
-     onClientError {
+     onClientError { //this: Response<T>
         //4xx
      }
-     onServerError {
+     onServerError { //this: Response<T>
         //5xx
      }
      onFailure { //it: Throwable
@@ -43,20 +42,24 @@ With Retrofit-DSL our code will look like below.
  }
 ```
 
-Isn't it good? But If you wanna use more lazy form, try this below.
+Isn't it good?
+
+### Lazy
+
+But If you wanna use more lazy form, Try this below.
 
 ```kotlin
   service.getMessage().then { message ->
       println(message)
   }.catch { res, t ->
-      when(res?.code) {
-       // res return when request not successful
-      }
+      res?.let { doSomething(it) } // res return when request not successful
       t?.let { alert(it) } //throwable return on failure
   }.finally {
-    dialog.dismiss() //Always call
+    dialog.dismiss() //Always call afterward
   }
 ```
+
+`catch()` and `finally` are optional
 
 ## Download
 

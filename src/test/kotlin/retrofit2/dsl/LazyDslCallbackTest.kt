@@ -6,6 +6,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.EOFException
 
 class LazyDslCallbackTest {
 
@@ -30,7 +31,22 @@ class LazyDslCallbackTest {
 
         waitFor {
             service.getMessage().then {
-                assert(it?.message == "Hello")
+                assert(it.message == "Hello")
+                resume()
+            }
+        }
+    }
+
+    @Test
+    fun emptyBody() {
+        server.enqueue {
+            setResponseCode(200)
+            setBody("")
+        }
+
+        waitFor {
+            service.getMessage().then {}.catch { _, t ->
+                assert(t is EOFException)
                 resume()
             }
         }
@@ -76,7 +92,7 @@ class LazyDslCallbackTest {
 
         waitFor {
             service.getMessage().then {
-                assert(it?.message == "Hello")
+                assert(it.message == "Hello")
             }.finally {
                 resume()
             }

@@ -29,7 +29,7 @@ import retrofit2.Response
 
 open class LazyDslCallback<T> : Callback<T> {
 
-    var then: ((T?) -> Unit)? = null
+    var then: ((T) -> Unit)? = null
     var catch: ((Response<T>?, Throwable?) -> Unit)? = null
     var finally: (() -> Unit)? = null
 
@@ -40,7 +40,7 @@ open class LazyDslCallback<T> : Callback<T> {
 
     override fun onResponse(call: Call<T>, response: Response<T>) {
         if (response.isSuccessful) {
-            then!!.invoke(response.body())
+            then!!.invoke(response.body()!!)
         } else {
             catch?.invoke(response, null)
         }
@@ -58,7 +58,7 @@ open class LazyDslCallback<T> : Callback<T> {
 
 fun <T> retrofit2.Call<T>.then(
     lazyCallback: LazyDslCallback<T> = LazyDslCallback(),
-    block: (T?) -> Unit
+    block: (T) -> Unit
 ): LazyDslCallback<T> {
     enqueue(lazyCallback.apply { then = block })
     return lazyCallback

@@ -29,16 +29,20 @@ import retrofit2.Response
 
 open class LazyDslCallback<T> : Callback<T> {
 
+    lateinit var call: Call<T>
+
     var then: ((T) -> Unit)? = null
     var catch: ((Response<T>?, Throwable?) -> Unit)? = null
     var finally: (() -> Unit)? = null
 
     override fun onFailure(call: Call<T>, t: Throwable) {
+        this.call = call
         catch?.invoke(null, t)
         finally?.invoke()
     }
 
     override fun onResponse(call: Call<T>, response: Response<T>) {
+        this.call = call
         if (response.isSuccessful) {
             then!!.invoke(response.body()!!)
         } else {

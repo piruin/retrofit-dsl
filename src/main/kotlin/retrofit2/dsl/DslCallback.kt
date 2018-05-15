@@ -29,22 +29,26 @@ import retrofit2.Response
 
 open class DslCallback<T> : Callback<T> {
 
-    private var always: (() -> Unit)? = null
-    private var onSuccess: ((Response<T>) -> Unit)? = null
-    private var onRedirect: ((Response<T>) -> Unit)? = null
-    private var onError: ((Response<T>) -> Unit)? = null
-    private var onClientError: ((Response<T>) -> Unit)? = null
-    private var onServerError: ((Response<T>) -> Unit)? = null
-    private var onFailure: ((t: Throwable) -> Unit)? = null
-    private var finally: (() -> Unit)? = null
+    lateinit var call: Call<T>
 
-    override fun onFailure(call: Call<T>, t: Throwable) {
+    var always: (() -> Unit)? = null
+    var onSuccess: ((Response<T>) -> Unit)? = null
+    var onRedirect: ((Response<T>) -> Unit)? = null
+    var onError: ((Response<T>) -> Unit)? = null
+    var onClientError: ((Response<T>) -> Unit)? = null
+    var onServerError: ((Response<T>) -> Unit)? = null
+    var onFailure: ((t: Throwable) -> Unit)? = null
+    var finally: (() -> Unit)? = null
+
+    final override fun onFailure(call: Call<T>, t: Throwable) {
+        this.call = call
         always?.invoke()
         onFailure?.invoke(t)
         finally?.invoke()
     }
 
-    override fun onResponse(call: Call<T>, response: Response<T>) {
+    final override fun onResponse(call: Call<T>, response: Response<T>) {
+        this.call = call
         always?.invoke()
         if (response.isSuccessful) {
             onSuccess?.invoke(response)
@@ -54,7 +58,7 @@ open class DslCallback<T> : Callback<T> {
         finally?.invoke()
     }
 
-    open fun onNotSuccess(response: Response<T>) {
+    fun onNotSuccess(response: Response<T>) {
         if (response.code() in 400..599)
             onError?.invoke(response)
         when (response.code()) {

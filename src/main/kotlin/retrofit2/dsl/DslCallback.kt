@@ -26,6 +26,7 @@ package retrofit2.dsl
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.Retrofit
 
 open class DslCallback<T> : Callback<T> {
 
@@ -98,6 +99,18 @@ open class DslCallback<T> : Callback<T> {
 
     fun finally(listener: () -> Unit) {
         finally = listener
+    }
+
+    @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+    inline fun <reified K> Response<T>?.errorBody(retrofit: Retrofit? = defaultRetrofit): K? {
+        if (this != null && errorBody() != null && retrofit != null) {
+            return retrofit.converterFor<K>().convert(errorBody()!!)
+        }
+        return null
+    }
+
+    companion object {
+        var defaultRetrofit: Retrofit? = null
     }
 }
 

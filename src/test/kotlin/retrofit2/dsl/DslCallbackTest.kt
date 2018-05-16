@@ -13,11 +13,14 @@ class DslCallbackTest {
 
     lateinit var service: MessagingService
 
+    val retrofit = retrofit {
+        baseUrl(server.url(""))
+        addConverterFactory(GsonConverterFactory.create())
+    }
+
     @Before fun setUp() {
-        service = retrofitFor<MessagingService> {
-            baseUrl(server.url(""))
-            addConverterFactory(GsonConverterFactory.create())
-        }
+        service = retrofit.create()
+        DslCallback.defaultRetrofit = retrofit
     }
 
     @Test fun onSuccess() {
@@ -46,7 +49,7 @@ class DslCallbackTest {
     @Test fun onRedirect() {
         server.enqueue {
             setResponseCode(300)
-            setBody("""{"message": "Redirect"}""")
+            setBody("""{"code":300, "message": "Redirect"}""")
         }
 
         waitFor {
@@ -55,10 +58,10 @@ class DslCallbackTest {
                     assert(true == false) { "onSuccess shouldn't be call" }
                 }
                 onError {
-                    assert(code() == 300) { "Must call onError before onClientError" }
+                    assert(true == false) { "onError shouldn't be call" }
                 }
                 onRedirect {
-                    assert(errorBody()?.string()?.contains("Redirect") == true)
+                    assert(errorBody<Messaging>() == Messaging(300, "Redirect"))
                     resume()
                 }
             }
@@ -97,8 +100,7 @@ class DslCallbackTest {
         waitFor {
             service.getMessage().enqueue {
                 onError {
-                    assert(code() == 400)
-                    assert(errorBody()?.string()?.contains("Bad Request") == true)
+                    assert(errorBody<Messaging>() == Messaging(400, "Bad Request"))
                     resume()
                 }
             }
@@ -117,7 +119,7 @@ class DslCallbackTest {
                     assert(code() == 401) { "Must call onError before onClientError" }
                 }
                 onClientError {
-                    assert(errorBody()?.string()?.contains("Unauthorized") == true)
+                    assert(errorBody<Messaging>()?.message == "Unauthorized")
                     resume()
                 }
                 onServerError {
@@ -142,7 +144,7 @@ class DslCallbackTest {
                     assert(true == false) { "onClientError shouldn't be call" }
                 }
                 onServerError {
-                    assert(errorBody()?.string()?.contains("Internal") == true)
+                    assert(errorBody<Messaging>()?.message == "Internal Server Error")
                     resume()
                 }
             }

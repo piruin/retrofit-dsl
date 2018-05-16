@@ -22,7 +22,7 @@ With Retrofit-DSL our code will look like below.
         println(body())
      }
      onError { //this: Response<T>
-        println(errorBody()) //call when response not in 2xx
+        println(errorBody<Message>()) //call when response not in 4xx-5xx
      }
      onRedirect { //this: Response<T>
         //3xx
@@ -37,7 +37,7 @@ With Retrofit-DSL our code will look like below.
         it.printStackTrace()
      }
      finally {
-        //always call successful or not
+       //Always call afterward
      }
  }
 ```

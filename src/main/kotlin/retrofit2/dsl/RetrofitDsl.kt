@@ -36,3 +36,7 @@ inline fun <reified T> retrofitFor(block: Retrofit.Builder.() -> Unit): T {
 inline fun <reified T> Retrofit.create(): T {
     return create(T::class.java)
 }
+
+inline fun <reified T> Retrofit.converterFor(
+    annotations: Array<out Annotation> = arrayOf()
+) = responseBodyConverter<T>(T::class.java, annotations)

@@ -26,7 +26,7 @@ class DslCallbackTest {
     @Test fun onSuccess() {
         server.enqueue {
             setResponseCode(200)
-            setBody("""{"message": "Hello"}""")
+            setBody("""{"code": 200, "message": "Hello"}""")
         }
 
         waitFor {
@@ -36,10 +36,11 @@ class DslCallbackTest {
                     isAlwaysCall = true
                 }
                 onSuccess {
-                    assert(body()?.message == "Hello") { "Response must be Hello" }
+                    assert(isOK)
+                    assert(body() == Messaging(200, "Hello"))
                 }
                 finally {
-                    assert(isAlwaysCall)
+                    assert(isAlwaysCall) { "always block should be called" }
                     resume()
                 }
             }
@@ -48,8 +49,8 @@ class DslCallbackTest {
 
     @Test fun onRedirect() {
         server.enqueue {
-            setResponseCode(300)
-            setBody("""{"code":300, "message": "Redirect"}""")
+            setResponseCode(301)
+            setBody("""{"code":301, "message": "Moved Permanently"}""")
         }
 
         waitFor {
@@ -61,7 +62,8 @@ class DslCallbackTest {
                     assert(true == false) { "onError shouldn't be call" }
                 }
                 onRedirect {
-                    assert(errorBody<Messaging>() == Messaging(300, "Redirect"))
+                    assert(isMovedPermanently)
+                    assert(errorBody<Messaging>() == Messaging(301, "Moved Permanently"))
                     resume()
                 }
             }
@@ -84,7 +86,7 @@ class DslCallbackTest {
                     assert(it is JsonSyntaxException)
                 }
                 finally {
-                    assert(isAlwaysCall)
+                    assert(isAlwaysCall) { "always block should also be called when failure" }
                     resume()
                 }
             }
@@ -100,6 +102,7 @@ class DslCallbackTest {
         waitFor {
             service.getMessage().enqueue {
                 onError {
+                    assert(isBadRequest)
                     assert(errorBody<Messaging>() == Messaging(400, "Bad Request"))
                     resume()
                 }
@@ -110,7 +113,7 @@ class DslCallbackTest {
     @Test fun onClientError() {
         server.enqueue {
             setResponseCode(401)
-            setBody("""{"message": "Unauthorized","code": 401}""")
+            setBody("""{"message": "Unauthorized", "code": 401 }""")
         }
 
         waitFor {
@@ -119,7 +122,8 @@ class DslCallbackTest {
                     assert(code() == 401) { "Must call onError before onClientError" }
                 }
                 onClientError {
-                    assert(errorBody<Messaging>()?.message == "Unauthorized")
+                    assert(isUnauthorized)
+                    assert(errorBody<Messaging>() == Messaging(401, "Unauthorized"))
                     resume()
                 }
                 onServerError {
@@ -132,7 +136,7 @@ class DslCallbackTest {
     @Test fun onServerError() {
         server.enqueue {
             setResponseCode(500)
-            setBody("""{"message": "Internal Server Error","code": 500}""")
+            setBody("""{"message": "Internal Server Error", "code": 500 }""")
         }
 
         waitFor {
@@ -144,6 +148,7 @@ class DslCallbackTest {
                     assert(true == false) { "onClientError shouldn't be call" }
                 }
                 onServerError {
+                    assert(isInternalServerError)
                     assert(errorBody<Messaging>()?.message == "Internal Server Error")
                     resume()
                 }
@@ -161,8 +166,8 @@ class DslCallbackTest {
         waitFor {
             service.sendMessage(Messaging(200, "Hello World")).enqueue {
                 onSuccess {
-                    assert(body()?.code == 201)
-                    assert(body()?.message == "created")
+                    assert(isCreated)
+                    assert(body() == Messaging(201, "created"))
                 }
                 finally {
                     resume()

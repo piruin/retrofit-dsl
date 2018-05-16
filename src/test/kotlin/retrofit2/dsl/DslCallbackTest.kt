@@ -20,7 +20,7 @@ class DslCallbackTest {
 
     @Before fun setUp() {
         service = retrofit.create()
-        DslCallback.defaultRetrofit = retrofit
+        RetrofitDslConfig.retrofit = retrofit
     }
 
     @Test fun onSuccess() {

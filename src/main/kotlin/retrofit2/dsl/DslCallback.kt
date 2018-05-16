@@ -101,16 +101,22 @@ open class DslCallback<T> : Callback<T> {
         finally = listener
     }
 
+    /**
+     * Get `errorBody()` of `Response<T>` as desire by `responseBodyConverter` of `retrofit`
+     *
+     * @param K Type of `errorBody()` to be parsed
+     * @param retrofit Source of responseBodyConverter. default is RestrofitDslConfig.retrofit
+     * @return errorBody() as desire type. nullable
+     *
+     * @throws IllegalArgumentException When both RestrofitDslConfig.retrofit and pass argument is `null`
+     */
     @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-    inline fun <reified K> Response<T>?.errorBody(retrofit: Retrofit? = defaultRetrofit): K? {
-        if (this != null && errorBody() != null && retrofit != null) {
-            return retrofit.converterFor<K>().convert(errorBody()!!)
+    inline fun <reified K> Response<T>.errorBody(retrofit: Retrofit? = RetrofitDslConfig.retrofit): K? {
+        require(retrofit != null) { "RetrofitDslConfig.retrofit should be set or passed as method argument" }
+        if (errorBody() != null) {
+            return retrofit!!.converterFor<K>().convert(errorBody()!!)
         }
         return null
-    }
-
-    companion object {
-        var defaultRetrofit: Retrofit? = null
     }
 }
 

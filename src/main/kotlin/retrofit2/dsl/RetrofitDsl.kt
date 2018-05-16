@@ -40,3 +40,9 @@ inline fun <reified T> Retrofit.create(): T {
 inline fun <reified T> Retrofit.converterFor(
     annotations: Array<out Annotation> = arrayOf()
 ) = responseBodyConverter<T>(T::class.java, annotations)
+
+class RetrofitDslConfig {
+    companion object {
+        var retrofit: Retrofit? = null
+    }
+}

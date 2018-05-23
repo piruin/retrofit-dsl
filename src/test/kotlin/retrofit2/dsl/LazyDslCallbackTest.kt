@@ -76,7 +76,7 @@ class LazyDslCallbackTest {
         }
 
         waitFor {
-            service.getMessage().then {}.catch { _, t ->
+            service.getMessage().then {}.always {}.catch { _, t ->
                 assert(t is JsonSyntaxException)
                 resume()
             }

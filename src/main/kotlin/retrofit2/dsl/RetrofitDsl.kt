@@ -24,6 +24,7 @@
 package retrofit2.dsl
 
 import retrofit2.Retrofit
+import retrofit2.dsl.paging.PagingAdapter
 
 inline fun retrofit(block: Retrofit.Builder.() -> Unit): Retrofit {
     return Retrofit.Builder().apply(block).build()!!
@@ -44,5 +45,6 @@ inline fun <reified T> Retrofit.converterFor(
 class RetrofitDslConfig {
     companion object {
         var retrofit: Retrofit? = null
+        var pagingAdapter: PagingAdapter? = null
     }
 }

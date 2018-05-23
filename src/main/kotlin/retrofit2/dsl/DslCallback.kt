@@ -31,7 +31,7 @@ import retrofit2.Retrofit
 open class DslCallback<T> : Callback<T> {
 
     lateinit var call: Call<T>
-
+    var page = RetrofitDslConfig.pagingAdapter
     var always: (() -> Unit)? = null
     var onSuccess: ((Response<T>) -> Unit)? = null
     var onRedirect: ((Response<T>) -> Unit)? = null
@@ -52,6 +52,7 @@ open class DslCallback<T> : Callback<T> {
         this.call = call
         always?.invoke()
         if (response.isSuccessful) {
+            page?.parse(response)
             onSuccess?.invoke(response)
         } else {
             onNotSuccess(response)
@@ -102,7 +103,7 @@ open class DslCallback<T> : Callback<T> {
     }
 
     /**
-     * Get `errorBody()` of `Response<T>` as desire by `responseBodyConverter` of `retrofit`
+     * Get `errorBody()` of `Response<T>` as desire type by `responseBodyConverter` of `retrofit`
      *
      * @param K Type of `errorBody()` to be parsed
      * @param retrofit Source of responseBodyConverter. default is RestrofitDslConfig.retrofit

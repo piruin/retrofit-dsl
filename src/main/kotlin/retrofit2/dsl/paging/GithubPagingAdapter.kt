@@ -21,18 +21,11 @@ import retrofit2.Response
  * [Original PageLinks](https://github.com/eclipse/egit-github/blob/master/org.eclipse.egit.github.core/src/org/eclipse/egit/github/core/client/PageLinks.java)
  */
 class GithubPagingAdapter : PagingAdapter {
-    private var _next: Int? = null
-    private var _last: Int? = null
-    private var _perPage: Int? = null
+    override fun <T> parse(response: Response<T>): Page? {
+        var _next: Int? = null
+        var _last: Int? = null
+        var _perPage: Int? = null
 
-    override val next: Int
-        get() = _next!!
-    override val last: Int
-        get() = _last!!
-    override val perPage: Int
-        get() = _perPage!!
-
-    override fun <T> parse(response: Response<T>) {
         val linkHeader = response.headers()[HEADER_LINK]
         if (linkHeader != null) {
             val links = linkHeader.split(DELIM_LINKS).dropLastWhile({ it.isEmpty() }).toTypedArray()
@@ -51,16 +44,14 @@ class GithubPagingAdapter : PagingAdapter {
                         .toTypedArray()
                     if (rel.size < 2 || !META_REL.equals(rel[0]))
                         continue
-
                     var relValue = rel[1]
                     if (relValue.startsWith("\"") && relValue.endsWith("\""))
                         relValue = relValue.substring(1, relValue.length - 1)
 
                     if (META_LAST.equals(relValue))
-                        _last = linkPart.getPageParam()
+                        _last = linkPart.getPageParam()!!
                     else if (META_NEXT.equals(relValue))
-                        _next = linkPart.getPageParam()
-
+                        _next = linkPart.getPageParam()!!
                     _perPage = linkPart.getPerPageParam() ?: _perPage
                 }
             }
@@ -75,6 +66,9 @@ class GithubPagingAdapter : PagingAdapter {
                 _perPage = it.getPerPageParam()
             }
         }
+        return if (_next != null && _last != null && _perPage != null) {
+            Page(_next!!, _last!!, _perPage!!)
+        } else null
     }
 
     fun String.getPageParam() = REGEX_PAGE_PARAM.find(this)?.groupValues?.get(1)?.toInt()

@@ -27,11 +27,13 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
+import retrofit2.dsl.paging.Page
 
 open class DslCallback<T> : Callback<T> {
 
     lateinit var call: Call<T>
-    var page = RetrofitDslConfig.pagingAdapter
+    var pagingAdapter = RetrofitDslConfig.pagingAdapter
+    var page: Page? = null
     var always: (() -> Unit)? = null
     var onSuccess: ((Response<T>) -> Unit)? = null
     var onRedirect: ((Response<T>) -> Unit)? = null
@@ -52,7 +54,7 @@ open class DslCallback<T> : Callback<T> {
         this.call = call
         always?.invoke()
         if (response.isSuccessful) {
-            page?.parse(response)
+            page = pagingAdapter?.parse(response)
             onSuccess?.invoke(response)
         } else {
             onNotSuccess(response)

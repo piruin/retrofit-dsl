@@ -21,6 +21,7 @@ import retrofit2.Response
  * [Original PageLinks](https://github.com/eclipse/egit-github/blob/master/org.eclipse.egit.github.core/src/org/eclipse/egit/github/core/client/PageLinks.java)
  */
 class GithubPagingAdapter : PagingAdapter {
+
     override fun <T> parse(response: Response<T>): Page? {
         var _next: Int? = null
         var _last: Int? = null
@@ -28,9 +29,9 @@ class GithubPagingAdapter : PagingAdapter {
 
         val linkHeader = response.headers()[HEADER_LINK]
         if (linkHeader != null) {
-            val links = linkHeader.split(DELIM_LINKS).dropLastWhile({ it.isEmpty() }).toTypedArray()
+            val links = linkHeader.split(DELIM_LINKS)
             for (link in links) {
-                val segments = link.split(DELIM_LINK_PARAM).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                val segments = link.split(DELIM_LINK_PARAM)
                 if (segments.size < 2)
                     continue
 
@@ -40,7 +41,7 @@ class GithubPagingAdapter : PagingAdapter {
                 linkPart = linkPart.substring(1, linkPart.length - 1)
 
                 for (i in 1 until segments.size) {
-                    val rel = segments[i].trim().split("=".toRegex()).dropLastWhile({ it.isEmpty() })
+                    val rel = segments[i].trim().split("=")
                         .toTypedArray()
                     if (rel.size < 2 || !META_REL.equals(rel[0]))
                         continue
@@ -75,6 +76,7 @@ class GithubPagingAdapter : PagingAdapter {
     fun String.getPerPageParam() = REGEX_PER_PAGE_PARAM.find(this)?.groupValues?.get(1)?.toInt()
 
     companion object {
+
         val DELIM_LINKS = Regex(",")
 
         val DELIM_LINK_PARAM = Regex(";")
